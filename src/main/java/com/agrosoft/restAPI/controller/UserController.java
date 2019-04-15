@@ -41,14 +41,14 @@ public class UserController {
                     if (updates.containsKey("first_name")) {
                         record.setFirst_name((String) updates.get("first_name"));
                     }
-                    if (updates.containsKey("surname")) {
-                        record.setSurname((String) updates.get(("surname")));
+                    if (updates.containsKey("last_name")) {
+                        record.setLast_name((String) updates.get(("last_name")));
                     }
-                    if (updates.containsKey("email")) {
-                        record.setEmail((String) updates.get("email"));
+                    if (updates.containsKey("username")) {
+                        record.setUsername((String) updates.get("username"));
                     }
-                    if (updates.containsKey("password_hash")) {
-                        record.setPassword_hash((String) updates.get("password_hash"));
+                    if (updates.containsKey("password")) {
+                        record.setPassword((String) updates.get("password"));
                     }
                     User updated = repository.save(record);
                     return ResponseEntity.ok().body(updated);
