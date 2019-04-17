@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 public class Farm {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long farm_id;
+    private Long farm_id;
     private String address;
     @OneToMany(mappedBy = "farm")
     @JsonBackReference

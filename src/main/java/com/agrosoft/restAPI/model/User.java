@@ -1,24 +1,21 @@
 package com.agrosoft.restAPI.model;
 
-import com.agrosoft.restAPI.model.audit.DateAudit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper=true)
 @Entity
-public class User extends DateAudit {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long user_id;
@@ -28,9 +25,7 @@ public class User extends DateAudit {
     private String username;
     @JsonIgnore
     private String password;
-//    private Date created_at;
-//    private Date updated_at;
-    private Date last_login;
+    private Instant created_at;
     @ManyToOne
     @JoinColumn(name = "farm_id")
     @JsonManagedReference
@@ -42,4 +37,11 @@ public class User extends DateAudit {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    public User(String first_name, String last_name, String username, String password) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.username = username;
+        this.password = password;
+    }
 }
