@@ -15,6 +15,7 @@ import com.agrosoft.restAPI.repository.UserRepository;
 import com.agrosoft.restAPI.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -66,6 +67,7 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
+    @PreAuthorize("hasRole('BOSS')")
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -86,7 +88,7 @@ public class AuthController {
 
         user.setRoles(Collections.singleton(userRole));
 
-        Farm farm = farmRepository.findById((long) 1)
+        Farm farm = farmRepository.findById(signUpRequest.getFarm_id()) // TODO: zrobić żeby farma była brana automatycznie z aktualnie zalogowanego użytkownika
                 .orElseThrow(() -> new AppException("Farm not found"));
 
         user.setFarm(farm);
