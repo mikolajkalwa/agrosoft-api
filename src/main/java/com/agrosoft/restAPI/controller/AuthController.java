@@ -67,7 +67,7 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
-    @PreAuthorize("hasRole('BOSS')")
+    @PreAuthorize("hasRole('BOSS') or hasRole('ADMIN')")
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -88,7 +88,9 @@ public class AuthController {
 
         user.setRoles(Collections.singleton(userRole));
 
-        Farm farm = farmRepository.findById(signUpRequest.getFarm_id()) // TODO: zrobić żeby farma była brana automatycznie z aktualnie zalogowanego użytkownika
+     /*   FIXME zrobić żeby farma była brana automatycznie z aktualnie zalogowanego użytkownika,
+            ewnetualnie witkacy to zrobi po stronie frontendu, bo przecież nie musi być dobrze tylko ma działać*/
+        Farm farm = farmRepository.findById(signUpRequest.getFarm_id())
                 .orElseThrow(() -> new AppException("Farm not found"));
 
         user.setFarm(farm);
