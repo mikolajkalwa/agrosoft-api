@@ -2,7 +2,6 @@ package com.agrosoft.restAPI.security;
 
 import com.agrosoft.restAPI.model.User;
 import com.agrosoft.restAPI.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,8 +11,11 @@ import javax.transaction.Transactional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-    @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     @Transactional

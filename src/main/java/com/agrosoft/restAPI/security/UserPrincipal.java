@@ -1,5 +1,6 @@
 package com.agrosoft.restAPI.security;
 
+import com.agrosoft.restAPI.model.Farm;
 import com.agrosoft.restAPI.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,8 @@ public class UserPrincipal implements UserDetails {
     private String username;
     @JsonIgnore
     private String password;
+    private Farm farm;
+
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserPrincipal create(User user) {
@@ -34,6 +37,7 @@ public class UserPrincipal implements UserDetails {
                 user.getLast_name(),
                 user.getUsername(),
                 user.getPassword(),
+                user.getFarm(),
                 authorities
         );
     }

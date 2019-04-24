@@ -12,10 +12,10 @@ import com.agrosoft.restAPI.payload.SignUpRequest;
 import com.agrosoft.restAPI.repository.FarmRepository;
 import com.agrosoft.restAPI.repository.RoleRepository;
 import com.agrosoft.restAPI.repository.UserRepository;
+import com.agrosoft.restAPI.security.CurrentUser;
 import com.agrosoft.restAPI.security.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.agrosoft.restAPI.security.UserPrincipal;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,23 +35,22 @@ import java.util.Collections;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    @Autowired
-    AuthenticationManager authenticationManager;
 
-    @Autowired
-    UserRepository userRepository;
+    private AuthenticationManager authenticationManager;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
+    private FarmRepository farmRepository;
+    private PasswordEncoder passwordEncoder;
+    private JwtTokenProvider tokenProvider;
 
-    @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
-    FarmRepository farmRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    JwtTokenProvider tokenProvider;
+    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, FarmRepository farmRepository, PasswordEncoder passwordEncoder, JwtTokenProvider tokenProvider) {
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.farmRepository = farmRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.tokenProvider = tokenProvider;
+    }
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -67,33 +66,29 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
-    @PreAuthorize("hasRole('BOSS') or hasRole('ADMIN')")
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest, @CurrentUser UserPrincipal currentUser) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Email is already taken!"));
         }
 
-        User user = new User(
-                signUpRequest.getFirst_name(),
-                signUpRequest.getLast_name(),
-                signUpRequest.getUsername(),
-                signUpRequest.getPassword()
-        );
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setFirst_name(signUpRequest.getFirst_name());
+        user.setLast_name(signUpRequest.getLast_name());
+        user.setUsername(signUpRequest.getUsername());
+        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setCreated_at(Instant.now());
+
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
 
         user.setRoles(Collections.singleton(userRole));
 
-     /*   FIXME zrobić żeby farma była brana automatycznie z aktualnie zalogowanego użytkownika,
-            ewnetualnie witkacy to zrobi po stronie frontendu, bo przecież nie musi być dobrze tylko ma działać*/
-        Farm farm = farmRepository.findById(signUpRequest.getFarm_id())
+        Farm farm = farmRepository.findById(currentUser.getFarm().getFarm_id())
                 .orElseThrow(() -> new AppException("Farm not found"));
 
         user.setFarm(farm);
+
         User result = userRepository.save(user);
 
         URI location = ServletUriComponentsBuilder
