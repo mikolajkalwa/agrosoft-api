@@ -10,6 +10,4 @@ public class CreateFieldRequest {
     private Double area;
     private String crop;
     private String status;
-    @NotNull
-    private Long farm_id;
 }

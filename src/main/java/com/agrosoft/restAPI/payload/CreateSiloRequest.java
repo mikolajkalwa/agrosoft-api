@@ -10,6 +10,4 @@ public class CreateSiloRequest {
     @NotNull
     private Integer capacity;
     private Double fill_level;
-    @NotNull
-    private Long farm_id;
 }
