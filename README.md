@@ -1,6 +1,10 @@
 # Agrosoft
 
-Pseudo-Dokumentacja API. 
+### Inne repozytoria dotyczące tego projektu
+
+https://github.com/kowalskiwiktor98/AgrosoftWebsite
+
+##Pseudo-Dokumentacja API. 
 
 WIP
 
@@ -50,6 +54,8 @@ Dla niepoprwanych danych logowania:
 
 ---
 ## Endpoint
+
+Tylko pan szef może tworzyć nowe konta dla swojej farmy.
 
 **auth/signup**
 
